@@ -1,0 +1,70 @@
+import tkinter as tk
+from tkinter import messagebox
+
+class PadariaApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Sistema de Padaria")
+        self.produtos = []
+
+        self.frame_produtos = tk.Frame(self.root)
+        self.frame_produtos.pack(pady=10)
+
+        tk.Label(self.frame_produtos, text="Nome do Produto:").grid(row=0, column=0)
+        self.nome_produto = tk.Entry(self.frame_produtos)
+        self.nome_produto.grid(row=0, column=1)
+
+        tk.Label(self.frame_produtos, text="Preço:").grid(row=1, column=0)
+        self.preco_produto = tk.Entry(self.frame_produtos)
+        self.preco_produto.grid(row=1, column=1)
+
+        tk.Button(self.frame_produtos, text="Adicionar Produto", command=self.adicionar_produto).grid(row=2, columnspan=2, pady=10)
+
+        self.frame_lista = tk.Frame(self.root)
+        self.frame_lista.pack(pady=10)
+
+        self.lista_produtos = tk.Listbox(self.frame_lista, width=50, height=10)
+        self.lista_produtos.pack()
+
+        self.frame_vendas = tk.Frame(self.root)
+        self.frame_vendas.pack(pady=10)
+
+        tk.Label(self.frame_vendas, text="Quantidade Vendida:").grid(row=0, column=0)
+        self.quantidade_vendida = tk.Entry(self.frame_vendas)
+        self.quantidade_vendida.grid(row=0, column=1)
+
+        tk.Button(self.frame_vendas, text="Registrar Venda", command=self.registrar_venda).grid(row=1, columnspan=2, pady=10)
+
+    def adicionar_produto(self):
+        nome = self.nome_produto.get()
+        preco = self.preco_produto.get()
+        if nome and preco:
+            try:
+                preco = float(preco)
+                self.produtos.append({"nome": nome, "preco": preco, "quantidade": 0})
+                self.lista_produtos.insert(tk.END, f"{nome} - R${preco:.2f}")
+                self.nome_produto.delete(0, tk.END)
+                self.preco_produto.delete(0, tk.END)
+            except ValueError:
+                messagebox.showerror("Erro", "Preço deve ser um número válido.")
+        else:
+            messagebox.showerror("Erro", "Por favor, preencha todos os campos.")
+
+    def registrar_venda(self):
+        produto_selecionado = self.lista_produtos.curselection()
+        if produto_selecionado:
+            try:
+                quantidade = int(self.quantidade_vendida.get())
+                produto = self.produtos[produto_selecionado[0]]
+                produto["quantidade"] += quantidade
+                messagebox.showinfo("Venda Registrada", f"Venda de {quantidade} unidades de {produto['nome']} registrada.")
+                self.quantidade_vendida.delete(0, tk.END)
+            except ValueError:
+                messagebox.showerror("Erro", "Quantidade deve ser um número inteiro.")
+        else:
+            messagebox.showerror("Erro", "Selecione um produto para registrar a venda.")
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = PadariaApp(root)
+    root.mainloop()
